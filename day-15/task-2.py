@@ -19,31 +19,22 @@ with open("input.txt") as f:
     dp = [[int(i) for i in line.strip()] for line in f.readlines()]
 
 size = len(dp)
-big_dp = [[0] * size * 5 for i in range(size * 5)]
+full_size = size * 5
+big_dp = [[0] * full_size for i in range(full_size)]
 
-big_dp[size * 5 - 1][size * 5 - 1] = new_val(size * 5 - 1, size * 5 - 1)
-x = size * 5 - 2
-y = size * 5 - 1
-while y >= 0:
-    while x >= 0:
-        risk = new_val(x, y)
-        min_n = sys.maxsize
-        for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
-            neighbour = val_or_max(x + dx, y + dy)
-            min_n = min(min_n, neighbour)
-        current_val = min_n + risk
-        big_dp[y][x] = current_val
-        for dx, dy in ((0, 1), (1, 0)):
-            neighbour = val_or_max(x + dx, y + dy)
-            if neighbour != sys.maxsize:
-                neighbour_risk = new_val(x + dx, y + dy)
-                if neighbour - neighbour_risk > current_val:
-                    big_dp[y + dy][x + dx] = current_val + neighbour_risk
-                    x += dx
-                    y += dy
-                    break
-        x -= 1
-    x = size * 5 - 1
-    y -= 1
+big_dp[full_size - 1][full_size - 1] = new_val(full_size - 1, full_size - 1)
+
+for y in range(full_size - 1, - 1, - 1):
+    for x in range(full_size - 1, -1, -1):
+        if x == y == full_size - 1:
+            continue
+        big_dp[y][x] = min(val_or_max(x + 1, y), val_or_max(x, y + 1)) + new_val(x, y)
+
+for i in range(4):
+    for y in range(full_size - 1, - 1, - 1):
+        for x in range(full_size - 1, -1, -1):
+            if x == y == full_size - 1:
+                continue
+            big_dp[y][x] = min(val_or_max(x + 1, y), val_or_max(x, y + 1), val_or_max(x - 1, y), val_or_max(x, y - 1)) + new_val(x, y)
 
 print(min(big_dp[0][1], big_dp[1][0]))
